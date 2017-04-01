@@ -49,6 +49,8 @@ RUN for v in ${LUA_VERSIONS} ; do \
 	eval "$(luaenv init -)" \
 	&& luaenv shell ${v} \
 	&& luarocks install \
+		compat53 0.3-1 \
+	&& luarocks install \
 		busted 2.0.rc12-1 \
 	&& luarocks install \
 		cluacov 0.1.0-1 \
