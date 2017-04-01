@@ -21,3 +21,6 @@ RUN apt -y update \
 	&& cd \
 	&& rm -fr luarocks-${LUAROCKS_VERSION} \
 	&& rm -fr /var/cache/apt
+
+RUN luarocks install \
+		busted 2.0.rc12-1
