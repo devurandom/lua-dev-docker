@@ -1,40 +1,56 @@
 FROM quay.io/devurandom/c-dev:debian8.7-1
 
-ENV LUA_VERSIONS="5.1 5.2 5.3"
-
-RUN echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list \
-	&& apt -y update \
-	&& apt -y install -t jessie-backports \
+# luarocks requires: curl, unzip
+RUN apt-get -y update \
+	&& apt-get -y install \
 		curl \
+		git \
 		unzip \
-		$(for v in ${LUA_VERSIONS} ; do \
-			echo lua${v} liblua${v}-dev \
-		; done) \
-	&& rm -fr /var/cache/apt
+	&& apt-get -y clean all
+
+ENV LUAENV_VERSION=afcd23a05c14fa015f6445454f0a5cccc7cebbb8 \
+	LUAENV_BUILD_VERSION=82f7913eea0d341c82cfc7fe130ac7641f904f14 \
+	LUAENV_LUAROCKS_VERSION=3cc71dde392efb5e0f4b7881a2877db1be6949d8
+
+ENV LUA_VERSIONS="5.1.5 5.2.4 5.3.3 luajit-2.0.4 luajit-2.1.0-beta2"
 
 ENV LUAROCKS_VERSION=2.4.1
 
-RUN curl --fail --location https://luarocks.org/releases/luarocks-${LUAROCKS_VERSION}.tar.gz | tar -xzf - \
-	&& cd luarocks-${LUAROCKS_VERSION} \
+ENV LUAENV_ROOT=/opt/luaenv \
+	PATH=/opt/luaenv/bin:$PATH
+
+RUN apt-get -y update \
+	&& __PACKAGES="libreadline6-dev libncurses5-dev" \
+	&& apt-get -y install ${__PACKAGES} \
+	&& git clone https://github.com/cehoffman/luaenv.git ${LUAENV_ROOT} && cd ${LUAENV_ROOT} && git checkout ${LUAENV_VERSION} \
+	&& git clone https://github.com/cehoffman/lua-build.git ${LUAENV_ROOT}/plugins/lua-build && cd ${LUAENV_ROOT}/plugins/lua-build && git checkout ${LUAENV_BUILD_VERSION} \
+	&& sed 's/luajit-2/LuaJIT-2/' -i share/lua-build/luajit-2.1.0-beta2 \
+	&& git clone https://github.com/xpol/luaenv-luarocks.git ${LUAENV_ROOT}/plugins/luaenv-luarocks && cd ${LUAENV_ROOT}/plugins/luaenv-luarocks && git checkout ${LUAENV_LUAROCKS_VERSION} \
+	&& eval "$(luaenv init -)" \
 	&& for v in ${LUA_VERSIONS} ; do \
-		apiv=$(lua${v} -e 'print(_VERSION)' | cut -d' ' -f2) ; \
-		echo "Building for lua${v} (API: ${apiv})" ; \
-		./configure \
-			--prefix=/usr \
-			--lua-suffix=${v} \
-			--lua-version=${apiv} \
-			--versioned-rocks-dir \
-		&& make bootstrap \
-		|| exit \
-		; done \
-	&& cd \
-	&& rm -fr luarocks-${LUAROCKS_VERSION}
+		echo "Installing Lua ${v}" ; \
+		if ! luaenv install ${v} ; then \
+			cat /tmp/lua-build.*.log ; \
+			exit 1 ; \
+		fi ; \
+	done \
+	&& rm -fr /tmp/lua-build.* \
+	&& for v in ${LUA_VERSIONS} ; do \
+		echo "Installing LuaRocks for Lua ${v}" ; \
+		luaenv shell ${v} \
+		&& luaenv luarocks ${LUAROCKS_VERSION} || exit ; \
+	done \
+	&& apt-get -y purge ${__PACKAGES} \
+	&& apt-get -y autoremove \
+	&& apt-get -y clean all
 
 RUN for v in ${LUA_VERSIONS} ; do \
-	echo "Building for lua${v}" ; \
-	luarocks-${v} install \
+	echo "Installing rocks for Lua ${v}" ; \
+	eval "$(luaenv init -)" \
+	&& luaenv shell ${v} \
+	&& luarocks install \
 		busted 2.0.rc12-1 \
-	&& luarocks-${v} install \
+	&& luarocks install \
 		cluacov 0.1.0-1 \
 	|| exit \
 	; done
