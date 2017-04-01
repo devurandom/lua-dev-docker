@@ -54,5 +54,7 @@ RUN for v in ${LUA_VERSIONS} ; do \
 		busted 2.0.rc12-1 \
 	&& luarocks install \
 		cluacov 0.1.0-1 \
+	&& luarocks install \
+		luacov-coveralls 0.2.1-1 \
 	|| exit \
 	; done
