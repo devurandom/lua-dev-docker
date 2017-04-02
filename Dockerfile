@@ -1,4 +1,4 @@
-FROM quay.io/devurandom/c-dev:debian8.7-2
+FROM quay.io/devurandom/c-dev:debian8.7-3
 
 # luarocks requires: curl, unzip
 RUN apt-get -y update \
@@ -54,7 +54,5 @@ RUN eval "$(luaenv init -)" \
 			busted 2.0.rc12-1 \
 		&& luarocks install \
 			cluacov 0.1.0-1 \
-		&& luarocks install \
-			luacov-coveralls 0.2.1-1 \
 		|| exit ; \
 	done
