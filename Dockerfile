@@ -48,10 +48,10 @@ RUN eval "$(luaenv init -)" \
 		echo "Installing rocks for Lua ${v}" ; \
 		luaenv shell ${v} \
 		&& luarocks install \
-			compat53 0.3-1 \
+			compat53 0.7-1 \
 		&& luarocks install \
-			busted 2.0.rc12-1 \
+			busted 2.0.rc13-0 \
 		&& luarocks install \
-			cluacov 0.1.0-1 \
+			cluacov 0.1.1-1 \
 		|| exit ; \
 	done
