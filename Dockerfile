@@ -1,4 +1,4 @@
-FROM quay.io/devurandom/c-dev:debian8.7-3
+FROM quay.io/devurandom/c-dev:debian9.6-1
 
 # luarocks requires: curl, unzip
 RUN apt-get -y update \
