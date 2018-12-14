@@ -8,9 +8,9 @@ RUN apt-get -y update \
 		unzip \
 	&& apt-get -y clean all
 
-ENV LUAENV_SRC_VERSION=afcd23a05c14fa015f6445454f0a5cccc7cebbb8 \
-	LUAENV_LUABUILD_SRC_VERSION=82f7913eea0d341c82cfc7fe130ac7641f904f14 \
-	LUAENV_LUAROCKS_SRC_VERSION=3cc71dde392efb5e0f4b7881a2877db1be6949d8
+ENV LUAENV_SRC_VERSION=3ef7626fded7042a0363a67d71153868f7075b8f \
+	LUAENV_LUABUILD_SRC_VERSION=8c7e2eaac4d3ba9d4d36d3c6e4ff1b29d32fdb63 \
+	LUAENV_LUAROCKS_SRC_VERSION=daa2adad89208138e313bc50247cac0b042b1597
 
 ENV LUA_VERSIONS="5.1.5 5.2.4 5.3.3 luajit-2.0.4 luajit-2.1.0-beta2"
 
@@ -24,7 +24,6 @@ RUN apt-get -y update \
 	&& apt-get -y install ${__PACKAGES} \
 	&& git clone https://github.com/cehoffman/luaenv.git ${LUAENV_ROOT} && cd ${LUAENV_ROOT} && git checkout ${LUAENV_SRC_VERSION} \
 	&& git clone https://github.com/cehoffman/lua-build.git ${LUAENV_ROOT}/plugins/lua-build && cd ${LUAENV_ROOT}/plugins/lua-build && git checkout ${LUAENV_LUABUILD_SRC_VERSION} \
-	&& sed 's/luajit-2/LuaJIT-2/' -i share/lua-build/luajit-2.1.0-beta2 \
 	&& git clone https://github.com/xpol/luaenv-luarocks.git ${LUAENV_ROOT}/plugins/luaenv-luarocks && cd ${LUAENV_ROOT}/plugins/luaenv-luarocks && git checkout ${LUAENV_LUAROCKS_SRC_VERSION} \
 	&& eval "$(luaenv init -)" \
 	&& for v in ${LUA_VERSIONS} ; do \
