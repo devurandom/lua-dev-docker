@@ -1,4 +1,4 @@
-FROM quay.io/devurandom/c-dev:debian9.6-1
+FROM quay.io/devurandom/c-dev:debian10.7-1
 
 # luarocks requires: curl, unzip
 RUN apt-get -y update \
@@ -9,12 +9,12 @@ RUN apt-get -y update \
 	&& apt-get -y clean all
 
 ENV LUAENV_SRC_VERSION=3ef7626fded7042a0363a67d71153868f7075b8f \
-	LUAENV_LUABUILD_SRC_VERSION=8c7e2eaac4d3ba9d4d36d3c6e4ff1b29d32fdb63 \
+	LUAENV_LUABUILD_SRC_VERSION=7846d9e575c08a9e8c605f542402c9d1b5f80c30 \
 	LUAENV_LUAROCKS_SRC_VERSION=daa2adad89208138e313bc50247cac0b042b1597
 
 ENV LUA_VERSIONS="5.1.5 5.2.4 5.3.5 luajit-2.0.5 luajit-2.1.0-beta3"
 
-ENV LUAROCKS_VERSION=2.4.1
+ENV LUAROCKS_VERSION=2.4.3
 
 ENV LUAENV_ROOT=/opt/luaenv \
 	PATH=/opt/luaenv/bin:$PATH
@@ -48,10 +48,10 @@ RUN eval "$(luaenv init -)" \
 		echo "Installing rocks for Lua ${v}" ; \
 		luaenv shell ${v} \
 		&& luarocks install \
-			compat53 0.7-1 \
+			compat53 0.8-1 \
 		&& luarocks install \
-			busted 2.0.rc13-0 \
+			busted 2.0.0-1 \
 		&& luarocks install \
-			cluacov 0.1.1-1 \
+			cluacov 0.1.2-1 \
 		|| exit ; \
 	done
